@@ -1,0 +1,183 @@
+@{
+    ViewData["Title"] = "Регистрация";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="auth-container d-flex">
+    <div class="container mx-auto align-self-center">
+        <div class="row">
+            <div class="col-6 d-lg-flex d-none h-100 my-auto top-0 start-0 text-center justify-content-center flex-column">
+                <div class="auth-cover-bg-image"></div>
+                <div class="auth-overlay"></div>
+                    
+                <div class="auth-cover">
+                    <div class="position-relative">
+                        <img src="~/src/assets/img/auth-cover.svg" alt="auth-img">
+                        <h2 class="mt-5 text-white font-weight-bolder px-2">Присоединяйтесь к нам</h2>
+                        <p class="text-white px-2">Начните управлять финансами уже сегодня</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-8 col-12 d-flex flex-column align-self-center ms-lg-auto me-lg-0 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <h2>Регистрация</h2>
+                                <p>Создайте аккаунт для начала работы</p>
+                            </div>
+
+                            <!-- Сообщение об ошибке -->
+                            <div class="col-12">
+                                <div id="error-message" class="alert alert-danger d-none" role="alert"></div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Имя</label>
+                                    <input type="text" id="fullName" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" id="email" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Телефон (необязательно)</label>
+                                    <input type="tel" id="phone" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Пароль</label>
+                                    <input type="password" id="password" class="form-control" required>
+                                    <small class="text-muted">Минимум 6 символов</small>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Подтвердите пароль</label>
+                                    <input type="password" id="confirmPassword" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <div class="form-check form-check-primary form-check-inline">
+                                        <input class="form-check-input me-3" type="checkbox" id="terms" required>
+                                        <label class="form-check-label" for="terms">
+                                            Я согласен с условиями использования
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="mb-4">
+                                    <button id="register-btn" class="btn btn-secondary w-100">ЗАРЕГИСТРИРОВАТЬСЯ</button>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="text-center">
+                                    <p class="mb-0">Уже есть аккаунт? <a href="/Account/Login" class="text-warning">Войти</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const registerBtn = document.getElementById('register-btn');
+            const fullNameInput = document.getElementById('fullName');
+            const emailInput = document.getElementById('email');
+            const phoneInput = document.getElementById('phone');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const termsCheckbox = document.getElementById('terms');
+            const errorMessage = document.getElementById('error-message');
+
+            // Обработчик формы
+            registerBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                const fullName = fullNameInput.value.trim();
+                const email = emailInput.value.trim();
+                const phone = phoneInput.value.trim();
+                const password = passwordInput.value;
+                const confirmPassword = confirmPasswordInput.value;
+
+                // Валидация
+                if (!fullName || !email || !password || !confirmPassword) {
+                    showError('Заполните все обязательные поля');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    showError('Пароль должен быть не менее 6 символов');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    showError('Пароли не совпадают');
+                    return;
+                }
+
+                if (!termsCheckbox.checked) {
+                    showError('Необходимо принять условия использования');
+                    return;
+                }
+
+                // Отключаем кнопку на время запроса
+                registerBtn.disabled = true;
+                registerBtn.textContent = 'РЕГИСТРИРУЕМ...';
+                hideError();
+
+                try {
+                    const response = await window.authService.register({
+                        fullName,
+                        email,
+                        phone,
+                        password
+                    });
+                    
+                    // Успешная регистрация - перенаправляем на дашборд
+                    window.location.href = '/Dashboard';
+                } catch (error) {
+                    if (error.isNetworkError) {
+                        showError('API сервер недоступен. Убедитесь что FinanceApp.Api запущен на https://localhost:7051');
+                    } else {
+                        showError(error.data?.message || 'Ошибка регистрации. Попробуйте снова.');
+                    }
+                } finally {
+                    registerBtn.disabled = false;
+                    registerBtn.textContent = 'ЗАРЕГИСТРИРОВАТЬСЯ';
+                }
+            });
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.remove('d-none');
+            }
+
+            function hideError() {
+                errorMessage.classList.add('d-none');
+            }
+        });
+    </script>
+}
+

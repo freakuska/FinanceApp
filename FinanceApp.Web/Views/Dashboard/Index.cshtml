@@ -1,0 +1,223 @@
+@{
+    ViewData["Title"] = "Дашборд";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+
+@section Styles {
+    <link href="~/src/assets/css/light/dashboard/dash_1.css" rel="stylesheet" type="text/css" />
+    <link href="~/src/assets/css/dark/dashboard/dash_1.css" rel="stylesheet" type="text/css" />
+    <link href="~/src/plugins/src/flatpickr/flatpickr.css" rel="stylesheet" type="text/css">
+}
+
+<div class="page-meta">
+    <nav class="breadcrumb-style-one" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">Дашборд</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row layout-top-spacing">
+
+    <!-- Статистика -->
+    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12 layout-spacing">
+        <div class="widget widget-card-four">
+            <div class="widget-content">
+                <div class="w-header">
+                    <div class="w-info">
+                        <h6 class="value">Доходы</h6>
+                    </div>
+                    <div class="task-action">
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" href="#" role="button" id="expenses" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-content">
+                    <div class="w-info">
+                        <p class="value" id="total-income">0 ₽</p>
+                    </div>
+                </div>
+
+                <div class="w-progress-stats">                                            
+                    <div class="progress">
+                        <div class="progress-bar bg-gradient-secondary" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="">
+                        <div class="w-icon">
+                            <p>Текущий период</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12 layout-spacing">
+        <div class="widget widget-card-four">
+            <div class="widget-content">
+                <div class="w-header">
+                    <div class="w-info">
+                        <h6 class="value">Расходы</h6>
+                    </div>
+                    <div class="task-action">
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" href="#" role="button" id="income" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-content">
+                    <div class="w-info">
+                        <p class="value" id="total-expense">0 ₽</p>
+                    </div>
+                </div>
+
+                <div class="w-progress-stats">                                            
+                    <div class="progress">
+                        <div class="progress-bar bg-gradient-danger" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="">
+                        <div class="w-icon">
+                            <p>Текущий период</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12 layout-spacing">
+        <div class="widget widget-card-four">
+            <div class="widget-content">
+                <div class="w-header">
+                    <div class="w-info">
+                        <h6 class="value">Баланс</h6>
+                    </div>
+                    <div class="task-action">
+                        <div class="dropdown">
+                            <a class="dropdown-toggle" href="#" role="button" id="balance" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-more-horizontal"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-content">
+                    <div class="w-info">
+                        <p class="value" id="balance">0 ₽</p>
+                    </div>
+                </div>
+
+                <div class="w-progress-stats">                                            
+                    <div class="progress">
+                        <div class="progress-bar bg-gradient-success" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="">
+                        <div class="w-icon">
+                            <p>Разница</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Форма добавления операции -->
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+        <div class="widget widget-card-one">
+            <div class="widget-content">
+                <div class="media">
+                    <div class="w-img">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                    </div>
+                    <div class="media-body">
+                        <h6>Добавить операцию</h6>
+                    </div>
+                </div>
+                
+                <form id="operation-form">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Тип</label>
+                            <select id="operation-type" class="form-select" required>
+                                <option value="0">Доход</option>
+                                <option value="1">Расход</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Сумма</label>
+                            <input type="number" id="operation-amount" class="form-control" step="0.01" placeholder="1000" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Способ оплаты</label>
+                            <select id="operation-payment" class="form-select" required>
+                                <option value="0">Наличные</option>
+                                <option value="1">Карта</option>
+                                <option value="2">Банковский перевод</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Дата</label>
+                            <input type="date" id="operation-date" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Описание</label>
+                            <input type="text" id="operation-description" class="form-control" placeholder="Зарплата, продукты, и т.д.">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary">Добавить</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Список операций -->
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+        <div class="widget widget-table-two">
+            <div class="widget-heading">
+                <h5 class="">Последние операции</h5>
+            </div>
+
+            <div class="widget-content">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><div class="th-content">Дата</div></th>
+                                <th><div class="th-content">Тип</div></th>
+                                <th><div class="th-content">Описание</div></th>
+                                <th><div class="th-content">Способ</div></th>
+                                <th><div class="th-content th-heading">Сумма</div></th>
+                                <th><div class="th-content">Действия</div></th>
+                            </tr>
+                        </thead>
+                        <tbody id="operations-list">
+                            <tr>
+                                <td colspan="6" class="text-center">Загрузка...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    <script src="~/src/plugins/src/flatpickr/flatpickr.js"></script>
+    <script src="~/js/app/dashboard.js"></script>
+}
+

@@ -1,0 +1,174 @@
+@{
+    ViewData["Title"] = "Управление тегами";
+    Layout = "~/Views/Shared/_MainLayout.cshtml";
+}
+
+@section Styles {
+    <link href="~/src/plugins/css/light/tagify/custom-tagify.css" rel="stylesheet" type="text/css" />
+    <link href="~/src/plugins/css/dark/tagify/custom-tagify.css" rel="stylesheet" type="text/css" />
+}
+
+<div class="page-meta">
+    <nav class="breadcrumb-style-one" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Dashboard">Дашборд</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Теги</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row layout-top-spacing">
+
+    <!-- Кнопка добавления тега -->
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
+        <div class="widget">
+            <div class="widget-heading">
+                <h5 class="">Теги</h5>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTagModal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Добавить тег
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Теги доходов -->
+    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12 layout-spacing">
+        <div class="widget widget-card-one">
+            <div class="widget-content">
+                <div class="media">
+                    <div class="w-img">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up-circle text-success"><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg>
+                    </div>
+                    <div class="media-body">
+                        <h6>Доходы</h6>
+                    </div>
+                </div>
+                <div id="income-tags" class="tags-container mt-3">
+                    <p class="text-muted">Загрузка...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Теги расходов -->
+    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12 layout-spacing">
+        <div class="widget widget-card-one">
+            <div class="widget-content">
+                <div class="media">
+                    <div class="w-img">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-down-circle text-danger"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 12 16 16 12"></polyline><line x1="12" y1="8" x2="12" y2="16"></line></svg>
+                    </div>
+                    <div class="media-body">
+                        <h6>Расходы</h6>
+                    </div>
+                </div>
+                <div id="expense-tags" class="tags-container mt-3">
+                    <p class="text-muted">Загрузка...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Теги переводов -->
+    <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12 layout-spacing">
+        <div class="widget widget-card-one">
+            <div class="widget-content">
+                <div class="media">
+                    <div class="w-img">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-repeat text-primary"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+                    </div>
+                    <div class="media-body">
+                        <h6>Переводы</h6>
+                    </div>
+                </div>
+                <div id="transfer-tags" class="tags-container mt-3">
+                    <p class="text-muted">Загрузка...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Модальное окно добавления тега -->
+<div class="modal fade" id="addTagModal" tabindex="-1" role="dialog" aria-labelledby="addTagModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTagModalLabel">Добавить тег</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="tag-form">
+                    <div class="mb-3">
+                        <label class="form-label">Название</label>
+                        <input type="text" id="tag-name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Тип</label>
+                        <select id="tag-type" class="form-select" required>
+                            <option value="0">Доход</option>
+                            <option value="1">Расход</option>
+                            <option value="2">Перевод</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Цвет</label>
+                        <input type="color" id="tag-color" class="form-control" value="#007bff">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Иконка (emoji)</label>
+                        <input type="text" id="tag-icon" class="form-control" placeholder="💰">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary" id="save-tag-btn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/app/tags-page.js"></script>
+}
+
+<style>
+    .tags-container {
+        min-height: 100px;
+    }
+    
+    .tag-item {
+        display: inline-block;
+        padding: 8px 12px;
+        margin: 4px;
+        border-radius: 6px;
+        background-color: #f1f2f3;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .tag-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .tag-item .tag-name {
+        font-weight: 600;
+        margin-left: 4px;
+    }
+    
+    .tag-item .tag-actions {
+        margin-left: 8px;
+    }
+    
+    .tag-item .tag-actions button {
+        border: none;
+        background: transparent;
+        padding: 0 4px;
+        cursor: pointer;
+    }
+</style>
+

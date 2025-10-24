@@ -1,0 +1,143 @@
+@{
+    ViewData["Title"] = "Вход";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="auth-container d-flex">
+    <div class="container mx-auto align-self-center">
+        <div class="row">
+            <div class="col-6 d-lg-flex d-none h-100 my-auto top-0 start-0 text-center justify-content-center flex-column">
+                <div class="auth-cover-bg-image"></div>
+                <div class="auth-overlay"></div>
+                    
+                <div class="auth-cover">
+                    <div class="position-relative">
+                        <img src="~/src/assets/img/auth-cover.svg" alt="auth-img">
+                        <h2 class="mt-5 text-white font-weight-bolder px-2">Управляйте финансами легко</h2>
+                        <p class="text-white px-2">Ведите учет доходов и расходов, анализируйте статистику</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-8 col-12 d-flex flex-column align-self-center ms-lg-auto me-lg-0 mx-auto">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <h2>Вход</h2>
+                                <p>Введите email и пароль для входа</p>
+                            </div>
+
+                            <!-- Сообщение об ошибке -->
+                            <div class="col-12">
+                                <div id="error-message" class="alert alert-danger d-none" role="alert"></div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" id="email" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="mb-4">
+                                    <label class="form-label">Пароль</label>
+                                    <input type="password" id="password" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <div class="form-check form-check-primary form-check-inline">
+                                        <input class="form-check-input me-3" type="checkbox" id="remember">
+                                        <label class="form-check-label" for="remember">
+                                            Запомнить меня
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="mb-4">
+                                    <button id="login-btn" class="btn btn-secondary w-100">ВОЙТИ</button>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="text-center">
+                                    <p class="mb-0">Нет аккаунта? <a href="/Account/Register" class="text-warning">Зарегистрироваться</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginBtn = document.getElementById('login-btn');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            const errorMessage = document.getElementById('error-message');
+
+            // Обработчик формы
+            loginBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+
+                // Валидация
+                if (!email || !password) {
+                    showError('Заполните все поля');
+                    return;
+                }
+
+                // Отключаем кнопку на время запроса
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'ВХОДИМ...';
+                hideError();
+
+                try {
+                    const response = await window.authService.login(email, password);
+                    
+                    // Успешный вход - перенаправляем на дашборд
+                    window.location.href = '/Dashboard';
+                } catch (error) {
+                    if (error.isNetworkError) {
+                        showError('API сервер недоступен. Убедитесь что FinanceApp.Api запущен на https://localhost:7051');
+                    } else {
+                        showError(error.data?.message || 'Ошибка входа. Проверьте email и пароль.');
+                    }
+                } finally {
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'ВОЙТИ';
+                }
+            });
+
+            // Enter для отправки формы
+            [emailInput, passwordInput].forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        loginBtn.click();
+                    }
+                });
+            });
+
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.remove('d-none');
+            }
+
+            function hideError() {
+                errorMessage.classList.add('d-none');
+            }
+        });
+    </script>
+}
+
