@@ -142,35 +142,45 @@
                 </div>
                 
                 <form id="operation-form">
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-3">
-                            <label class="form-label">Тип</label>
-                            <select id="operation-type" class="form-select" required>
-                                <option value="0">Доход</option>
-                                <option value="1">Расход</option>
-                            </select>
+                            <div class="form-group mb-4">
+                                <label for="operation-type">Тип</label>
+                                <select id="operation-type" class="form-select" required>
+                                    <option value="0">Доход</option>
+                                    <option value="1">Расход</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Сумма</label>
-                            <input type="number" id="operation-amount" class="form-control" step="0.01" placeholder="1000" required>
+                            <div class="form-group mb-4">
+                                <label for="operation-amount">Сумма</label>
+                                <input type="number" id="operation-amount" class="form-control" step="0.01" placeholder="1000" required>
+                            </div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Способ оплаты</label>
-                            <select id="operation-payment" class="form-select" required>
-                                <option value="0">Наличные</option>
-                                <option value="1">Карта</option>
-                                <option value="2">Банковский перевод</option>
-                            </select>
+                            <div class="form-group mb-4">
+                                <label for="operation-payment">Способ оплаты</label>
+                                <select id="operation-payment" class="form-select" required>
+                                    <option value="0">Наличные</option>
+                                    <option value="1">Карта</option>
+                                    <option value="2">Банковский перевод</option>
+                                </select>
+                            </div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Дата</label>
-                            <input type="date" id="operation-date" class="form-control" required>
+                            <div class="form-group mb-4">
+                                <label for="operation-date">Дата</label>
+                                <input type="date" id="operation-date" class="form-control" required>
+                            </div>
                         </div>
                     </div>
-                    <div class="row mb-3">
+                    <div class="row">
                         <div class="col-md-12">
-                            <label class="form-label">Описание</label>
-                            <input type="text" id="operation-description" class="form-control" placeholder="Зарплата, продукты, и т.д.">
+                            <div class="form-group mb-4">
+                                <label for="operation-description">Описание</label>
+                                <input type="text" id="operation-description" class="form-control" placeholder="Зарплата, продукты, и т.д.">
+                            </div>
                         </div>
                     </div>
                     <div class="row">
