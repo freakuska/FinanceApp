@@ -16,6 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Role> Roles { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<FinancialOperation> FinancialOperations { get; set; }
     public DbSet<OperationTag> OperationTags { get; set; }

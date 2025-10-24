@@ -1,11 +1,17 @@
+using FinanceApp.Api.Extensions;
 using FinanceApp.Infrastructure.Dtos;
 using FinanceApp.Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceApp.Api.Controllers;
 
+/// <summary>
+/// Управление финансовыми операциями
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize] // Все методы требуют авторизации
 public class OperationsController(IFinancialOperationService operationService) : ControllerBase
 {
     // GET /api/operations
@@ -100,10 +106,10 @@ public class OperationsController(IFinancialOperationService operationService) :
 
     private Guid GetCurrentUserId()
     {
-        // TODO: Получить из JWT токена
-        // var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        // return Guid.Parse(userIdClaim);
+        var userId = User.GetUserId();
+        if (!userId.HasValue)
+            throw new UnauthorizedAccessException("Пользователь не авторизован");
         
-        return Guid.Parse("00000000-0000-0000-0000-000000000001"); // Заглушка
+        return userId.Value;
     }
 }

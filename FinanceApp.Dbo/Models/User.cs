@@ -20,6 +20,7 @@ public class User
 
     // Навигационные свойства
     public virtual ICollection<UserRole> UserRoles { get; set; }
+    public virtual ICollection<RefreshToken> RefreshTokens { get; set; }
     public virtual ICollection<Tag> OwnedTags { get; set; }
     public virtual ICollection<FinancialOperation> OwnedOperations { get; set; }
     public virtual ICollection<FinancialOperation> CreatedOperations { get; set; }

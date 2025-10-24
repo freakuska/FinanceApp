@@ -1,14 +1,19 @@
-using Microsoft.AspNetCore.Mvc;
-using FinanceApp.Infrastructure.Services;
+using FinanceApp.Api.Extensions;
 using FinanceApp.Infrastructure.Dtos;
-using System.Threading.Tasks;
+using FinanceApp.Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceApp.Api.Controllers;
 
+/// <summary>
+/// Управление пользователями
+/// </summary>
 [ApiController]
-    [Route("api/[controller]")]
-    public class UsersController : ControllerBase
-    {
+[Route("api/[controller]")]
+[Authorize] // Базовая авторизация для всех методов
+public class UsersController : ControllerBase
+{
         private readonly IUserService _userService;
 
         public UsersController(IUserService userService)
@@ -18,6 +23,7 @@ namespace FinanceApp.Api.Controllers;
 
         // GET: api/user/{id}
         [HttpGet("{id}")]
+        [Authorize(Roles = "SUPER_ADMIN,ADMIN,MANAGER")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var user = await _userService.GetByIdAsync(id);
@@ -26,6 +32,7 @@ namespace FinanceApp.Api.Controllers;
 
         // GET: api/user/email/{email}
         [HttpGet("email/{email}")]
+        [Authorize(Roles = "SUPER_ADMIN,ADMIN")]
         public async Task<IActionResult> GetByEmail(string email)
         {
             var user = await _userService.GetByEmailAsync(email);
@@ -34,6 +41,7 @@ namespace FinanceApp.Api.Controllers;
 
         // POST: api/user
         [HttpPost]
+        [Authorize(Roles = "SUPER_ADMIN,ADMIN")]
         public async Task<IActionResult> Create([FromBody] CreateUserDto dto)
         {
             try
@@ -64,6 +72,7 @@ namespace FinanceApp.Api.Controllers;
 
         // DELETE: api/user/{id}
         [HttpDelete("{id}")]
+        [Authorize(Roles = "SUPER_ADMIN,ADMIN")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var result = await _userService.DeleteAsync(id);
@@ -92,6 +101,7 @@ namespace FinanceApp.Api.Controllers;
 
         // GET: api/user/all
         [HttpGet("all")]
+        [Authorize(Roles = "SUPER_ADMIN,ADMIN,MANAGER")]
         public async Task<IActionResult> GetAll(int page = 1, int pageSize = 50)
         {
             var users = await _userService.GetAllAsync(page, pageSize);
@@ -100,6 +110,7 @@ namespace FinanceApp.Api.Controllers;
 
         // POST: api/user/assign-role
         [HttpPost("assign-role")]
+        [Authorize(Roles = "SUPER_ADMIN,ADMIN")]
         public async Task<IActionResult> AssignRole([FromBody] AssignRoleRequest request)
         {
             var result = await _userService.AssignRoleAsync(request.UserId, request.RoleCode, request.AssignedBy);
@@ -108,6 +119,7 @@ namespace FinanceApp.Api.Controllers;
 
         // POST: api/user/remove-role
         [HttpPost("remove-role")]
+        [Authorize(Roles = "SUPER_ADMIN,ADMIN")]
         public async Task<IActionResult> RemoveRole([FromBody] RemoveRoleRequest request)
         {
             var result = await _userService.RemoveRoleAsync(request.UserId, request.RoleCode);

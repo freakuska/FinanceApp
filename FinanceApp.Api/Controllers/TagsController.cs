@@ -1,6 +1,8 @@
+using FinanceApp.Api.Extensions;
 using FinanceApp.Dbo.Enums;
 using FinanceApp.Infrastructure.Dtos;
 using FinanceApp.Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceApp.Api.Controllers;
@@ -10,6 +12,7 @@ namespace FinanceApp.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
+[Authorize] // Все методы требуют авторизации
 public class TagsController : ControllerBase
 {
     private readonly ITagService _tagService;
@@ -275,11 +278,11 @@ public class TagsController : ControllerBase
 
     private Guid GetCurrentUserId()
     {
-        // TODO: Получить из JWT токена
-        // var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        // return Guid.Parse(userIdClaim);
+        var userId = User.GetUserId();
+        if (!userId.HasValue)
+            throw new UnauthorizedAccessException("Пользователь не авторизован");
         
-        return Guid.Parse("00000000-0000-0000-0000-000000000001"); // Заглушка
+        return userId.Value;
     }
     
     /// <summary>

@@ -1,5 +1,6 @@
 using FinanceApp.Infrastructure.Dtos;
 using FinanceApp.Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinanceApp.Api.Controllers;
@@ -10,6 +11,7 @@ namespace FinanceApp.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
+[Authorize] // Базовая авторизация для всех методов
 public class RolesController : ControllerBase
 {
     private readonly IRoleService _roleService;
@@ -70,6 +72,7 @@ public class RolesController : ControllerBase
     /// </summary>
     /// <param name="dto">Данные новой роли</param>
     [HttpPost]
+    [Authorize(Roles = "SUPER_ADMIN,ADMIN")]
     [ProducesResponseType(typeof(RoleDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create([FromBody] CreateRoleDto dto)
@@ -91,6 +94,7 @@ public class RolesController : ControllerBase
     /// <param name="id">ID роли</param>
     /// <param name="dto">Обновлённые данные</param>
     [HttpPut("{id}")]
+    [Authorize(Roles = "SUPER_ADMIN,ADMIN")]
     [ProducesResponseType(typeof(RoleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -116,6 +120,7 @@ public class RolesController : ControllerBase
     /// </summary>
     /// <param name="id">ID роли</param>
     [HttpDelete("{id}")]
+    [Authorize(Roles = "SUPER_ADMIN,ADMIN")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

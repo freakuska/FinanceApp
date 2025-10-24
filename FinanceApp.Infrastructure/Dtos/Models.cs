@@ -250,3 +250,33 @@ public record PagedResult<T>
     public int PageSize { get; init; }
     public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
 }
+
+// ============================================
+// Authentication DTOs
+// ============================================
+public record LoginRequestDto
+{
+    public string Email { get; init; }
+    public string Password { get; init; }
+}
+
+public record RegisterRequestDto
+{
+    public string Email { get; init; }
+    public string Password { get; init; }
+    public string FullName { get; init; }
+    public string Phone { get; init; }
+}
+
+public record AuthResponseDto
+{
+    public string AccessToken { get; init; }
+    public string RefreshToken { get; init; }
+    public DateTime ExpiresAt { get; init; }
+    public UserDto User { get; init; }
+}
+
+public record RefreshTokenRequestDto
+{
+    public string RefreshToken { get; init; }
+}

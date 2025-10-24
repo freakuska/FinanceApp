@@ -1,4 +1,7 @@
 using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using FinanceApp.Dbo.Enums;
@@ -6,6 +9,8 @@ using FinanceApp.Dbo.Models;
 using FinanceApp.Infrastructure.Data;
 using FinanceApp.Infrastructure.Dtos;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FinanceApp.Infrastructure.Services;
 
@@ -1228,4 +1233,215 @@ public class ReportService : IReportService
         // Для примера возвращаем CSV
         return await ExportToCsvAsync(userId, startDate, endDate);
     }
+}
+
+// ============================================
+// AuthService
+// ============================================
+public class AuthService : IAuthService
+{
+    private readonly ApplicationDbContext _context;
+    private readonly IConfiguration _configuration;
+    private readonly IUserService _userService;
+
+    public AuthService(ApplicationDbContext context, IConfiguration configuration, IUserService userService)
+    {
+        _context = context;
+        _configuration = configuration;
+        _userService = userService;
+    }
+
+    public async Task<AuthResponseDto> LoginAsync(LoginRequestDto dto)
+    {
+        // Ищем пользователя по email
+        var user = await _context.Users
+            .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+        if (user == null || !user.IsActive)
+            throw new UnauthorizedAccessException("Неверный email или пароль");
+
+        // Проверяем пароль
+        if (!VerifyPassword(dto.Password, user.PasswordHash))
+            throw new UnauthorizedAccessException("Неверный email или пароль");
+
+        // Генерируем токены
+        var accessToken = GenerateAccessToken(user);
+        var refreshToken = await GenerateRefreshTokenAsync(user.Id);
+
+        // Обновляем время последнего входа
+        await _userService.UpdateLastLoginAsync(user.Id);
+
+        var userDto = await _userService.GetByIdAsync(user.Id);
+
+        return new AuthResponseDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken.Token,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(GetAccessTokenLifetimeMinutes()),
+            User = userDto
+        };
+    }
+
+    public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto dto)
+    {
+        // Проверяем существование пользователя
+        var exists = await _context.Users.AnyAsync(u => u.Email == dto.Email);
+        if (exists)
+            throw new InvalidOperationException("Пользователь с таким email уже существует");
+
+        // Создаём пользователя
+        var createUserDto = new CreateUserDto
+        {
+            Email = dto.Email,
+            Password = dto.Password,
+            FullName = dto.FullName,
+            Phone = dto.Phone
+        };
+
+        var userDto = await _userService.CreateAsync(createUserDto);
+
+        // Автоматически логиним пользователя
+        return await LoginAsync(new LoginRequestDto
+        {
+            Email = dto.Email,
+            Password = dto.Password
+        });
+    }
+
+    public async Task<AuthResponseDto> RefreshTokenAsync(string refreshToken)
+    {
+        // Находим refresh token в базе
+        var token = await _context.RefreshTokens
+            .Include(rt => rt.User)
+                .ThenInclude(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+
+        if (token == null)
+            throw new UnauthorizedAccessException("Недействительный refresh token");
+
+        // Проверяем, не отозван ли токен
+        if (token.RevokedAt.HasValue)
+            throw new UnauthorizedAccessException("Токен был отозван");
+
+        // Проверяем срок действия
+        if (token.ExpiresAt < DateTime.UtcNow)
+            throw new UnauthorizedAccessException("Срок действия токена истёк");
+
+        // Проверяем активность пользователя
+        if (!token.User.IsActive)
+            throw new UnauthorizedAccessException("Пользователь неактивен");
+
+        // Генерируем новый access token
+        var accessToken = GenerateAccessToken(token.User);
+
+        // Генерируем новый refresh token и удаляем старый
+        await RevokeTokenAsync(refreshToken);
+        var newRefreshToken = await GenerateRefreshTokenAsync(token.UserId);
+
+        var userDto = await _userService.GetByIdAsync(token.UserId);
+
+        return new AuthResponseDto
+        {
+            AccessToken = accessToken,
+            RefreshToken = newRefreshToken.Token,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(GetAccessTokenLifetimeMinutes()),
+            User = userDto
+        };
+    }
+
+    public async Task<bool> RevokeTokenAsync(string refreshToken)
+    {
+        var token = await _context.RefreshTokens
+            .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+
+        if (token == null)
+            return false;
+
+        token.RevokedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+    private string GenerateAccessToken(User user)
+    {
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(GetJwtSecretKey()));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+        // Собираем claims
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Name, user.FullName ?? user.Email),
+            new Claim("userId", user.Id.ToString())
+        };
+
+        // Добавляем роли
+        if (user.UserRoles != null)
+        {
+            foreach (var userRole in user.UserRoles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, userRole.Role.Code));
+
+                // Добавляем права доступа (permissions)
+                var permissions = JsonSerializer.Deserialize<List<string>>(userRole.Role.Permissions);
+                foreach (var permission in permissions)
+                {
+                    claims.Add(new Claim("permission", permission));
+                }
+            }
+        }
+
+        var token = new JwtSecurityToken(
+            issuer: GetJwtIssuer(),
+            audience: GetJwtAudience(),
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(GetAccessTokenLifetimeMinutes()),
+            signingCredentials: credentials
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    private async Task<RefreshToken> GenerateRefreshTokenAsync(Guid userId)
+    {
+        var refreshToken = new RefreshToken
+        {
+            UserId = userId,
+            Token = GenerateRandomToken(),
+            ExpiresAt = DateTime.UtcNow.AddDays(GetRefreshTokenLifetimeDays()),
+            CreatedAt = DateTime.UtcNow
+        };
+
+        _context.RefreshTokens.Add(refreshToken);
+        await _context.SaveChangesAsync();
+
+        return refreshToken;
+    }
+
+    private string GenerateRandomToken()
+    {
+        var randomBytes = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomBytes);
+        return Convert.ToBase64String(randomBytes);
+    }
+
+    private bool VerifyPassword(string password, string hash)
+    {
+        var passwordHash = Convert.ToBase64String(
+            System.Security.Cryptography.SHA256.HashData(
+                System.Text.Encoding.UTF8.GetBytes(password)));
+        return passwordHash == hash;
+    }
+
+    private string GetJwtSecretKey() => _configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured");
+    private string GetJwtIssuer() => _configuration["Jwt:Issuer"] ?? "FinanceApp.Api";
+    private string GetJwtAudience() => _configuration["Jwt:Audience"] ?? "FinanceApp.Client";
+    private int GetAccessTokenLifetimeMinutes() => int.Parse(_configuration["Jwt:AccessTokenLifetimeMinutes"] ?? "15");
+    private int GetRefreshTokenLifetimeDays() => int.Parse(_configuration["Jwt:RefreshTokenLifetimeDays"] ?? "7");
 }

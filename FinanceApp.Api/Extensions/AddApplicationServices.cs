@@ -12,6 +12,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITagService, TagService>();
         services.AddScoped<IFinancialOperationService, FinancialOperationService>();
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }

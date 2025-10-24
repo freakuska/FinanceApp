@@ -102,3 +102,14 @@ public interface IReportService
     Task<byte[]> ExportToCsvAsync(Guid userId, DateTime startDate, DateTime endDate);
     Task<byte[]> ExportToExcelAsync(Guid userId, DateTime startDate, DateTime endDate);
 }
+
+// ============================================
+// IAuthService
+// ============================================
+public interface IAuthService
+{
+    Task<AuthResponseDto> LoginAsync(LoginRequestDto dto);
+    Task<AuthResponseDto> RegisterAsync(RegisterRequestDto dto);
+    Task<AuthResponseDto> RefreshTokenAsync(string refreshToken);
+    Task<bool> RevokeTokenAsync(string refreshToken);
+}

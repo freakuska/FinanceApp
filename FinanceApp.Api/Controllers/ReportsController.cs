@@ -1,14 +1,19 @@
-using Microsoft.AspNetCore.Mvc;
-using FinanceApp.Infrastructure.Services;
+using FinanceApp.Api.Extensions;
 using FinanceApp.Infrastructure.Dtos;
-using System.Threading.Tasks;
+using FinanceApp.Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-namespace FinanceApp.Api.Controllers
+namespace FinanceApp.Api.Controllers;
+
+/// <summary>
+/// Отчёты и аналитика
+/// </summary>
+[ApiController]
+[Route("api/[controller]")]
+[Authorize] // Все методы требуют авторизации
+public class ReportsController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ReportsController : ControllerBase
-    {
         private readonly IReportService _reportService;
 
         public ReportsController(IReportService reportService)
@@ -81,11 +86,10 @@ namespace FinanceApp.Api.Controllers
 
         private Guid GetCurrentUserId()
         {
-            // TODO: Получить из JWT токена
-            // var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            // return Guid.Parse(userIdClaim);
-
-            return Guid.Parse("00000000-0000-0000-0000-000000000001"); // Заглушка
+            var userId = User.GetUserId();
+            if (!userId.HasValue)
+                throw new UnauthorizedAccessException("Пользователь не авторизован");
+            
+            return userId.Value;
         }
-    }
 }
