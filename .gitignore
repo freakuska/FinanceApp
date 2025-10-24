@@ -1,0 +1,124 @@
+# Build results
+**/bin/
+**/obj/
+[Dd]ebug/
+[Rr]elease/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio cache/options directory
+.vs/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+*.dll
+*.pdb
+*.cache
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Files built by Visual Studio
+*.log
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+
+# Test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+TestResult.xml
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Code coverage
+coverage*.json
+coverage*.xml
+coverage*.info
+*.coverage
+*.coveragexml
+
+# Publish profiles
+*.[Pp]ublish.xml
+*.pubxml
+*.publishproj
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/*
+
+# Node.js (если используется для фронтенда)
+node_modules/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.history/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-shm
+*.db-wal
+*.mdf
+*.ldf
+*.ndf
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Application specific
+appsettings.*.local.json
+secrets.json
+
+# FinanceApp project specific
+# Uncomment if you want to ignore specific environment configs
+# FinanceApp.Api/appsettings.Development.json
+# FinanceApp.Api/appsettings.Production.json
+# FinanceApp.Api/appsettings.Staging.json
+
+# Uncomment if you want to ignore all migrations except the latest
+# FinanceApp.Infrastructure/Migrations/*.cs
+# FinanceApp.Infrastructure/Migrations/*.Designer.cs
