@@ -62,9 +62,36 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
         ClockSkew = TimeSpan.Zero // Убираем дополнительное время на часовые пояса
     };
+    
+    // Читаем токен из cookie
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            // Сначала пробуем получить из cookie
+            if (context.Request.Cookies.ContainsKey("AccessToken"))
+            {
+                context.Token = context.Request.Cookies["AccessToken"];
+            }
+            // Если в cookie нет, проверяем Authorization header (для API клиентов)
+            return Task.CompletedTask;
+        }
+    };
 });
 
 builder.Services.AddAuthorization();
+
+// CORS для Web проекта
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("WebPolicy", policy =>
+    {
+        policy.WithOrigins("https://localhost:7073", "http://localhost:5260") // URL Web проекта
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // Важно для cookies
+    });
+});
 
 builder.Services.AddApplicationServices();
 builder.Services.AddControllers();
@@ -114,6 +141,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("WebPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
