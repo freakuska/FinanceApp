@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.getElementById('total-income').textContent = formatMoney(rubStats.totalIncome);
         document.getElementById('total-expense').textContent = formatMoney(rubStats.totalExpense);
-        document.getElementById('balance').textContent = formatMoney(rubStats.balance);
+        document.getElementById('total-balance').textContent = formatMoney(rubStats.balance);
     }
     
     /**

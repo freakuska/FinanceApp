@@ -161,8 +161,8 @@ public record OperationFilterDto
     public DateTime? StartDate { get; init; }
     public DateTime? EndDate { get; init; }
     public OperationType? Type { get; init; }
-    public string Currency { get; init; }
-    public List<Guid> TagIds { get; init; }
+    public string? Currency { get; init; }
+    public List<Guid>? TagIds { get; init; }
     public int Page { get; init; } = 1;
     public int PageSize { get; init; } = 50;
 }

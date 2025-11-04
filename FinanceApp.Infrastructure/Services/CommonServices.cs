@@ -61,6 +61,7 @@ public class UserService : IUserService
             Phone = dto.Phone,
             IsActive = true,
             IsVerified = false,
+            AvatarUrl = String.Empty,
             Settings = JsonSerializer.Serialize(new UserSettingsDto())
         };
 
@@ -1298,6 +1299,7 @@ public class AuthService : IAuthService
             Password = dto.Password,
             FullName = dto.FullName,
             Phone = dto.Phone
+            
         };
 
         var userDto = await _userService.CreateAsync(createUserDto);

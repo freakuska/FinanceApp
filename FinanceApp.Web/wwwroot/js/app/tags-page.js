@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         try {
+            debugger;
             await window.tagsService.createTag({
                 name: name,
                 type: type,
