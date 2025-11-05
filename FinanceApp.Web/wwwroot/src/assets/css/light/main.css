@@ -99,9 +99,9 @@ select.form-custom::-ms-expand {
   background-color: #bfc9d4;
 }
 
-.modal-content {
-  background: #0e1726;
-}
+/*.modal-content {*/
+/*  background: #0e1726;*/
+/*}*/
 
 .code-section-container {
   margin-top: 20px;

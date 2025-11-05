@@ -1,0 +1,25 @@
+/* Кастомные стили для FinanceApp */
+
+/* Отступы между элементами меню в сайдбаре */
+#sidebar ul.menu-categories li.menu {
+    margin-bottom: 8px;
+    line-height: 2.5;
+}
+
+/* Выравнивание высоты карточек статистики */
+.widget.widget-card-four {
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+}
+
+.widget.widget-card-four .widget-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.widget.widget-card-four .w-progress-stats {
+    margin-top: auto;
+}
+
