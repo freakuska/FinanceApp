@@ -120,7 +120,7 @@ body.dark #container.fixed-header {
 body.dark #content {
   width: 50%;
   flex-grow: 8;
-  margin-top: 107px;
+  margin-top: 54px;
   margin-bottom: 0;
   margin-left: 212px;
   -webkit-transition: 0.3s ease all;
@@ -747,7 +747,7 @@ body.dark .sidebar-wrapper {
   -webkit-user-drag: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   border-right: 1px solid #0e1726;
-  top: 107px;
+  top: 54px;
 }
 body.dark .shadow-bottom {
   display: block;

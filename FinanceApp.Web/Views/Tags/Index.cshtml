@@ -5,7 +5,7 @@
 
 @section Styles {
     <link href="~/src/plugins/css/light/tagify/custom-tagify.css" rel="stylesheet" type="text/css" />
-    <link href="~/src/plugins/css/dark/tagify/custom-tagify.css" rel="stylesheet" type="text/css" />
+    @* <link href="~/src/plugins/css/dark/tagify/custom-tagify.css" rel="stylesheet" type="text/css" /> *@
 }
 
 <div class="page-meta">
@@ -22,7 +22,7 @@
     <!-- Кнопка добавления тега -->
     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 layout-spacing">
         <div class="widget">
-            <div class="widget-heading">
+            <div class="widget-heading p-4">
                 <h5 class="">Теги</h5>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTagModal">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -35,12 +35,12 @@
     <!-- Теги доходов -->
     <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12 layout-spacing">
         <div class="widget widget-card-one">
-            <div class="widget-content">
+            <div class="widget-content p-4">
                 <div class="media">
                     <div class="w-img">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-up-circle text-success"><circle cx="12" cy="12" r="10"></circle><polyline points="16 12 12 8 8 12"></polyline><line x1="12" y1="16" x2="12" y2="8"></line></svg>
                     </div>
-                    <div class="media-body">
+                    <div class="media-body" style="padding: 3px;">
                         <h6>Доходы</h6>
                     </div>
                 </div>
@@ -54,12 +54,12 @@
     <!-- Теги расходов -->
     <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12 layout-spacing">
         <div class="widget widget-card-one">
-            <div class="widget-content">
+            <div class="widget-content p-4">
                 <div class="media">
                     <div class="w-img">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-down-circle text-danger"><circle cx="12" cy="12" r="10"></circle><polyline points="8 12 12 16 16 12"></polyline><line x1="12" y1="8" x2="12" y2="16"></line></svg>
                     </div>
-                    <div class="media-body">
+                    <div class="media-body" style="padding: 3px;">
                         <h6>Расходы</h6>
                     </div>
                 </div>
@@ -73,12 +73,12 @@
     <!-- Теги переводов -->
     <div class="col-xl-4 col-lg-6 col-md-6 col-sm-12 col-12 layout-spacing">
         <div class="widget widget-card-one">
-            <div class="widget-content">
+            <div class="widget-content p-4">
                 <div class="media">
                     <div class="w-img">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-repeat text-primary"><polyline points="17 1 21 5 17 9"></polyline><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><polyline points="7 23 3 19 7 15"></polyline><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
                     </div>
-                    <div class="media-body">
+                    <div class="media-body" style="padding: 3px;">
                         <h6>Переводы</h6>
                     </div>
                 </div>

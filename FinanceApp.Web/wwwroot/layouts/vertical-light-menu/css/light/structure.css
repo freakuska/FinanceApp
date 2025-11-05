@@ -107,7 +107,7 @@ code {
 #content {
   width: 50%;
   flex-grow: 8;
-  margin-top: 107px;
+  margin-top: 54px;
   margin-bottom: 0;
   margin-left: 212px;
   -webkit-transition: 0.3s ease all;
@@ -771,7 +771,7 @@ body .navbar .dark-mode, body:not(.dark) .navbar .dark-mode {
   -webkit-user-drag: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   border-right: 1px solid rgb(215, 224, 234);
-  top: 107px;
+  top: 54px;
 }
 
 .shadow-bottom {
