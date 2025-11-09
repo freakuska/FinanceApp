@@ -146,7 +146,7 @@ public class TagsController : ControllerBase
                 Visibility = dto.Visibility
             };
 
-            var tag = await _tagService.CreateAsync(createDto);
+            var tag = await _tagService.CreateAsync(userId, createDto);
             return CreatedAtAction(nameof(GetById), new { id = tag.Id }, tag);
         }
         catch (Exception ex)

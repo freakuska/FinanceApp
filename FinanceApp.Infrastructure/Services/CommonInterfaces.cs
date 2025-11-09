@@ -44,7 +44,7 @@ public interface ITagService
 {
     Task<TagDto> GetByIdAsync(Guid id);
     Task<TagDto> GetBySlugAsync(string slug);
-    Task<TagDto> CreateAsync(CreateTagDto dto);
+    Task<TagDto> CreateAsync(Guid userId, CreateTagDto dto);
     Task<TagDto> UpdateAsync(Guid id, UpdateTagDto dto);
     Task<bool> DeleteAsync(Guid id);
     Task<List<TagDto>> GetByTypeAsync(TagType type, Guid? userId = null);

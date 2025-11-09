@@ -43,6 +43,7 @@ public class FinancialOperationConfiguration : IEntityTypeConfiguration<Financia
         // Финансовые данные
         builder.Property(e => e.Type)
             .HasConversion<string>()
+            .HasColumnName("type")
             .HasMaxLength(20);  // "Income", "Expense", "Transfer"
         // ===== MONEY VALUE OBJECT (добавить сюда!) =====
         builder.OwnsOne(e => e.Money, money =>
@@ -74,6 +75,7 @@ public class FinancialOperationConfiguration : IEntityTypeConfiguration<Financia
 
         builder.Property(e => e.PaymentMethod)
             .HasConversion<string>()
+            .HasColumnName("payment_method")
             .HasMaxLength(30);  // "Cash", "Card", "BankTransfer"
 
         builder.Property(e => e.OperationDateTime)

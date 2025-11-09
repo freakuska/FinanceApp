@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using FinanceApp.Dbo.Enums;
 
 namespace FinanceApp.Infrastructure.Dtos;
@@ -89,24 +90,29 @@ public record TagDto
     public string Visibility { get; init; }
     public int? Level { get; init; }
     public int UsageCount { get; init; }
+    public Guid? ParentId { get; init; }
+    public string ParentName { get; init; }
     public List<TagDto> Children { get; init; }
 }
 
 public record CreateTagDto
 {
-    public string Name { get; init; }
+    public string? Name { get; init; }
     public TagType Type { get; init; }
     public Guid? ParentId { get; init; }
-    public string Icon { get; init; }
-    public string Color { get; init; }
+    public string? Icon { get; init; }
+    public string? Color { get; init; }
     public TagVisibility Visibility { get; init; } = TagVisibility.Private;
 }
 
 public record UpdateTagDto
 {
-    public string Name { get; init; }
-    public string Icon { get; init; }
-    public string Color { get; init; }
+    public string? Name { get; init; }
+    public string? Icon { get; init; }
+    public string? Color { get; init; }
+    
+    public Guid? ParentId { get; init; }
+    
     public TagVisibility Visibility { get; init; }
     public int? SortOrder { get; init; }
 }
@@ -135,18 +141,28 @@ public record MoneyDto
 
 public record CreateOperationDto
 {
+    [JsonPropertyName( "type" )]
     public OperationType Type { get; init; }
+    [JsonPropertyName( "amount" )]
     public decimal Amount { get; init; }
+    
+    [JsonPropertyName( "currency" )]
     public string Currency { get; init; } = "RUB";
+    [JsonPropertyName( "paymentMethod" )]
     public PaymentMethod PaymentMethod { get; init; }
-    public string Description { get; init; }
-    public string Notes { get; init; }
+    [JsonPropertyName( "description" )]
+    public string? Description { get; init; }
+    [JsonPropertyName( "notes")]
+    public string? Notes { get; init; }
+    [JsonPropertyName("operationDateTime")]
     public DateTime? OperationDateTime { get; init; }
-    public List<Guid> TagIds { get; init; }
+    [JsonPropertyName("tagIds")]
+    public List<Guid>? TagIds { get; init; }
 }
 
 public record UpdateOperationDto
 {
+    public OperationType? Type { get; init; }
     public decimal? Amount { get; init; }
     public string Currency { get; init; }
     public PaymentMethod? PaymentMethod { get; init; }

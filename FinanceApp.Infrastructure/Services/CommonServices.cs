@@ -407,6 +407,8 @@ public class TagService : ITagService
     {
         var tag = await _context.Tags
             .Include(t => t.ChildTags)
+                .ThenInclude(ct => ct.ChildTags) // Подгружаем вложенные дочерние теги
+            .Include(t => t.ParentTag) // Подгружаем родителя
             .FirstOrDefaultAsync(t => t.Id == id);
 
         return tag == null ? null : MapToDto(tag);
@@ -421,7 +423,7 @@ public class TagService : ITagService
         return tag == null ? null : MapToDto(tag);
     }
 
-    public async Task<TagDto> CreateAsync(CreateTagDto dto)
+    public async Task<TagDto> CreateAsync(Guid userId, CreateTagDto dto)
     {
         var slug = GenerateSlug(dto.Name);
         var exists = await _context.Tags.AnyAsync(t => t.Slug == slug);
@@ -453,6 +455,7 @@ public class TagService : ITagService
             Icon = dto.Icon,
             Color = dto.Color,
             Visibility = dto.Visibility,
+            OwnerId = userId,
             IsActive = true,
             IsSystem = false
         };
@@ -465,22 +468,67 @@ public class TagService : ITagService
 
     public async Task<TagDto> UpdateAsync(Guid id, UpdateTagDto dto)
     {
-        var tag = await _context.Tags.FindAsync(id);
+        var tag = await _context.Tags
+            .Include(t => t.ChildTags)
+            .Include(t => t.ParentTag)
+            .FirstOrDefaultAsync(t => t.Id == id);
+            
         if (tag == null)
             throw new KeyNotFoundException("Tag not found");
 
         if (tag.IsSystem)
             throw new InvalidOperationException("Cannot modify system tag");
 
+        // Обновляем имя и slug если изменилось
         if (!string.IsNullOrEmpty(dto.Name) && dto.Name != tag.Name)
         {
             tag.Name = dto.Name;
             tag.Slug = GenerateSlug(dto.Name);
+            
+            // Обновляем path для дочерних элементов
+            if (tag.ChildTags?.Any() == true)
+            {
+                await UpdateChildTagsPaths(tag);
+            }
+        }
+
+        // Обновляем родителя если указан
+        if (dto.ParentId != tag.ParentId)
+        {
+            // Проверяем, что не создаём циклическую зависимость
+            if (dto.ParentId.HasValue && await IsDescendantOf(dto.ParentId.Value, tag.Id))
+                throw new InvalidOperationException("Cannot create circular dependency");
+
+            tag.ParentId = dto.ParentId;
+            
+            // Пересчитываем уровень и путь
+            if (dto.ParentId.HasValue)
+            {
+                var parent = await _context.Tags.FindAsync(dto.ParentId.Value);
+                if (parent != null)
+                {
+                    tag.Level = (parent.Level ?? 0) + 1;
+                    tag.Path = $"{parent.Path}/{tag.Slug}";
+                }
+            }
+            else
+            {
+                tag.Level = 0;
+                tag.Path = tag.Slug;
+            }
+            
+            // Обновляем пути дочерних элементов
+            if (tag.ChildTags?.Any() == true)
+            {
+                await UpdateChildTagsPaths(tag);
+            }
         }
 
         tag.Icon = dto.Icon ?? tag.Icon;
         tag.Color = dto.Color ?? tag.Color;
         tag.Visibility = dto.Visibility;
+        tag.ParentId = dto.ParentId;
+        tag.OwnerId = tag.OwnerId;
         
         if (dto.SortOrder.HasValue)
             tag.SortOrder = dto.SortOrder.Value;
@@ -488,7 +536,9 @@ public class TagService : ITagService
         tag.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
-        return MapToDto(tag);
+        
+        // Перезагружаем с дочерними элементами для правильного DTO
+        return await GetByIdAsync(tag.Id);
     }
 
     public async Task<bool> DeleteAsync(Guid id)
@@ -497,15 +547,27 @@ public class TagService : ITagService
         if (tag == null || tag.IsSystem) return false;
 
         // Проверяем есть ли дочерние теги
-        var hasChildren = await _context.Tags.AnyAsync(t => t.ParentId == id);
+        var hasChildren = await _context.Tags.AnyAsync(t => t.ParentId == id && t.IsActive);
         if (hasChildren)
             throw new InvalidOperationException("Cannot delete tag with children");
 
+        // Проверяем есть ли связанные операции
+        var hasOperations = await _context.OperationTags.AnyAsync(ot => ot.TagId == id);
+        if (hasOperations)
+        {
+            // Можно либо запретить удаление, либо просто деактивировать
+            // Деактивируем, чтобы сохранить историю
+        }
+
+        // Устанавливаем флаг IsActive в false для мягкого удаления
         tag.IsActive = false;
         tag.UpdatedAt = DateTime.UtcNow;
 
-        await _context.SaveChangesAsync();
-        return true;
+        // Обновляем сущность в контексте
+        _context.Tags.Update(tag);
+        
+        var result = await _context.SaveChangesAsync();
+        return result > 0;
     }
 
     public async Task<List<TagDto>> GetByTypeAsync(TagType type, Guid? userId = null)
@@ -630,7 +692,14 @@ public class TagService : ITagService
             Visibility = tag.Visibility.ToString(),
             Level = tag.Level,
             UsageCount = tag.UsageCount,
-            Children = tag.ChildTags?.Select(MapToDto).ToList() ?? new List<TagDto>()
+            ParentId = tag.ParentId,
+            ParentName = tag.ParentTag?.Name,
+            Children = tag.ChildTags?
+                .Where(ct => ct.IsActive)
+                .OrderBy(ct => ct.SortOrder ?? 0)
+                .ThenBy(ct => ct.Name)
+                .Select(MapToDto)
+                .ToList() ?? new List<TagDto>()
         };
     }
 
@@ -651,6 +720,35 @@ public class TagService : ITagService
             .Replace("э", "e").Replace("ю", "yu").Replace("я", "ya");
 
         return new string(slug.Where(c => char.IsLetterOrDigit(c) || c == '-').ToArray());
+    }
+    
+    private async Task<bool> IsDescendantOf(Guid possibleDescendantId, Guid ancestorId)
+    {
+        var tag = await _context.Tags.FindAsync(possibleDescendantId);
+        while (tag != null && tag.ParentId.HasValue)
+        {
+            if (tag.ParentId == ancestorId)
+                return true;
+            tag = await _context.Tags.FindAsync(tag.ParentId.Value);
+        }
+        return false;
+    }
+    
+    private async Task UpdateChildTagsPaths(Tag parentTag)
+    {
+        var childTags = await _context.Tags
+            .Where(t => t.ParentId == parentTag.Id)
+            .ToListAsync();
+            
+        foreach (var child in childTags)
+        {
+            child.Level = (parentTag.Level ?? 0) + 1;
+            child.Path = $"{parentTag.Path}/{child.Slug}";
+            child.UpdatedAt = DateTime.UtcNow;
+            
+            // Рекурсивно обновляем дочерние элементы
+            await UpdateChildTagsPaths(child);
+        }
     }
 }
 
@@ -725,6 +823,14 @@ public class FinancialOperationService : IFinancialOperationService
         if (operation == null)
             throw new KeyNotFoundException("Operation not found");
 
+        // Обновляем тип операции
+        if (dto.Type.HasValue)
+        {
+            operation.Type = dto.Type.Value;
+            _context.Entry(operation).Property(o => o.Type).IsModified = true;
+        }
+
+        // Обновляем сумму и валюту
         if (dto.Amount.HasValue || !string.IsNullOrEmpty(dto.Currency))
         {
             var amount = dto.Amount ?? operation.Money.Amount;
@@ -732,12 +838,20 @@ public class FinancialOperationService : IFinancialOperationService
             operation.Money = new Money(amount, currency);
         }
 
+        // Обновляем способ оплаты
         if (dto.PaymentMethod.HasValue)
+        {
             operation.PaymentMethod = dto.PaymentMethod.Value;
+        }
 
-        operation.Description = dto.Description ?? operation.Description;
-        operation.Notes = dto.Notes ?? operation.Notes;
+        // Обновляем описание и заметки
+        if (!string.IsNullOrEmpty(dto.Description))
+            operation.Description = dto.Description;
+        
+        if (!string.IsNullOrEmpty(dto.Notes))
+            operation.Notes = dto.Notes;
 
+        // Обновляем дату операции
         if (dto.OperationDateTime.HasValue)
             operation.OperationDateTime = dto.OperationDateTime.Value;
 
@@ -750,6 +864,9 @@ public class FinancialOperationService : IFinancialOperationService
             // Удаляем старые связи
             var oldTags = operation.OperationTags.ToList();
             _context.OperationTags.RemoveRange(oldTags);
+            
+            // Сохраняем изменения после удаления
+            await _context.SaveChangesAsync();
 
             // Добавляем новые
             foreach (var tagId in dto.TagIds)
