@@ -7,6 +7,7 @@
     <link href="~/src/assets/css/light/dashboard/dash_1.css" rel="stylesheet" type="text/css" />
     <link href="~/src/assets/css/dark/dashboard/dash_1.css" rel="stylesheet" type="text/css" />
     <link href="~/src/plugins/src/flatpickr/flatpickr.css" rel="stylesheet" type="text/css">
+    <link href="~/css/custom-operations.css" rel="stylesheet" type="text/css" />
 }
 
 <div class="page-meta">
@@ -185,7 +186,14 @@
                     </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <button type="submit" class="btn btn-primary">Добавить</button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-plus me-2"></i>
+                                Добавить
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="cancel-edit-btn" style="display: none;">
+                                <i class="fas fa-times me-2"></i>
+                                Отменить
+                            </button>
                         </div>
                     </div>
                 </form>
@@ -226,8 +234,101 @@
 
 </div>
 
+<!-- Модальное окно редактирования операции -->
+<div class="modal fade" id="editOperationModal" tabindex="-1" role="dialog" aria-labelledby="editOperationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editOperationModalLabel">Редактировать операцию</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="edit-operation-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="edit-operation-type">Тип операции</label>
+                                <select id="edit-operation-type" class="form-select" required>
+                                    <option value="0">Доход</option>
+                                    <option value="1">Расход</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="edit-operation-amount">Сумма</label>
+                                <input type="number" id="edit-operation-amount" class="form-control" step="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="edit-operation-payment">Способ оплаты</label>
+                                <select id="edit-operation-payment" class="form-select" required>
+                                    <option value="0">Наличные</option>
+                                    <option value="1">Карта</option>
+                                    <option value="2">Банковский перевод</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label for="edit-operation-date">Дата операции</label>
+                                <input type="date" id="edit-operation-date" class="form-control" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group mb-3">
+                                <label for="edit-operation-description">Описание</label>
+                                <input type="text" id="edit-operation-description" class="form-control" placeholder="Описание операции">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group mb-3">
+                                <label for="edit-operation-notes">Заметки</label>
+                                <textarea id="edit-operation-notes" class="form-control" rows="3" placeholder="Дополнительная информация"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group mb-3">
+                                <label for="edit-operation-tags">Теги</label>
+                                <div id="edit-operation-tags-container" class="d-flex flex-wrap gap-2">
+                                    <span class="text-muted">Загрузка тегов...</span>
+                                </div>
+                                <input type="hidden" id="edit-operation-tags" value="">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Отмена
+                </button>
+                <button type="button" class="btn btn-danger" id="delete-operation-modal-btn">
+                    <i class="fas fa-trash me-2"></i>
+                    Удалить
+                </button>
+                <button type="button" class="btn btn-success" id="save-operation-modal-btn">
+                    <i class="fas fa-check me-2"></i>
+                    Сохранить
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/src/plugins/src/flatpickr/flatpickr.js"></script>
+    <script src="~/js/app/config.js"></script>
     <script src="~/js/app/dashboard.js"></script>
 }
 

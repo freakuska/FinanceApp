@@ -22,6 +22,12 @@ class ApiClient {
             credentials: 'include', // Важно для cookies
         };
 
+        // Добавляем токен из localStorage, если он есть
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            defaultOptions.headers['Authorization'] = `Bearer ${token}`;
+        }
+
         const config = {
             ...defaultOptions,
             ...options,

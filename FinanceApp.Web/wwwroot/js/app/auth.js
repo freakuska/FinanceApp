@@ -18,6 +18,16 @@ class AuthService {
                 email,
                 password
             });
+            
+            // Сохраняем токен в localStorage
+            if (response && response.accessToken) {
+                localStorage.setItem('access_token', response.accessToken);
+                if (response.refreshToken) {
+                    localStorage.setItem('refresh_token', response.refreshToken);
+                }
+                console.log('✅ Токен сохранён в localStorage');
+            }
+            
             return response;
         } catch (error) {
             throw error;
@@ -37,6 +47,16 @@ class AuthService {
                 fullName: data.fullName,
                 phone: data.phone || ''
             });
+            
+            // Сохраняем токен в localStorage
+            if (response && response.accessToken) {
+                localStorage.setItem('access_token', response.accessToken);
+                if (response.refreshToken) {
+                    localStorage.setItem('refresh_token', response.refreshToken);
+                }
+                console.log('✅ Токен сохранён в localStorage');
+            }
+            
             return response;
         } catch (error) {
             throw error;
@@ -50,10 +70,19 @@ class AuthService {
     async logout() {
         try {
             await this.api.post('/api/auth/logout', {});
+            
+            // Очищаем токены из localStorage
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            console.log('✅ Токены удалены из localStorage');
+            
             window.location.href = '/Account/Login';
         } catch (error) {
             console.error('Logout error:', error);
-            // В любом случае перенаправляем на логин
+            
+            // В любом случае очищаем и перенаправляем
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
             window.location.href = '/Account/Login';
         }
     }

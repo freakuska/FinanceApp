@@ -1,132 +1,256 @@
-/**
- * Логика страницы управления тегами
- */
+// Управление тегами
+const API_BASE_URL = 'https://localhost:7051/api';
+let currentEditingTagId = null;
+
 document.addEventListener('DOMContentLoaded', function() {
-    const tagForm = document.getElementById('tag-form');
-    const saveTagBtn = document.getElementById('save-tag-btn');
-    const addTagModal = new bootstrap.Modal(document.getElementById('addTagModal'));
+    loadAllTags();
     
-    // Загрузка тегов при открытии страницы
-    loadTags();
-    
-    // Обработчик сохранения тега
-    saveTagBtn.addEventListener('click', async function() {
-        const name = document.getElementById('tag-name').value.trim();
-        const type = parseInt(document.getElementById('tag-type').value);
-        const color = document.getElementById('tag-color').value;
-        const icon = document.getElementById('tag-icon').value.trim();
-        
-        if (!name) {
-            alert('Введите название тега');
-            return;
-        }
-        
-        try {
-            debugger;
-            await window.tagsService.createTag({
-                name: name,
-                type: type,
-                color: color,
-                icon: icon,
-                visibility: 'Private'
-            });
-            
-            // Закрываем модальное окно и очищаем форму
-            addTagModal.hide();
-            tagForm.reset();
-            
-            // Перезагружаем теги
-            loadTags();
-            
-            showNotification('Тег создан успешно', 'success');
-        } catch (error) {
-            showNotification('Ошибка при создании тега: ' + (error.data?.message || error.message), 'error');
-        }
-    });
-    
-    /**
-     * Загрузка всех тегов
-     */
-    async function loadTags() {
-        try {
-            // Загружаем теги по типам
-            const incomeTags = await window.tagsService.getTags('Income');
-            const expenseTags = await window.tagsService.getTags('Expense');
-            const transferTags = await window.tagsService.getTags('Transfer');
-            
-            displayTags('income-tags', incomeTags);
-            displayTags('expense-tags', expenseTags);
-            displayTags('transfer-tags', transferTags);
-        } catch (error) {
-            console.error('Error loading tags:', error);
-            
-            const errorMessage = error.isNetworkError 
-                ? '<p class="text-warning">API недоступен</p>' 
-                : '<p class="text-danger">Ошибка загрузки</p>';
-            
-            document.getElementById('income-tags').innerHTML = errorMessage;
-            document.getElementById('expense-tags').innerHTML = errorMessage;
-            document.getElementById('transfer-tags').innerHTML = errorMessage;
-        }
+    // Обработчик сохранения нового тега
+    document.getElementById('save-tag-btn').addEventListener('click', saveTag);
+});
+
+async function loadAllTags() {
+    try {
+        await loadTagsByType('Income', 'income-tags');
+        await loadTagsByType('Expense', 'expense-tags');
+        await loadTagsByType('Transfer', 'transfer-tags');
+    } catch (error) {
+        console.error('Ошибка загрузки тегов:', error);
+        showNotification('Ошибка загрузки тегов', 'error');
     }
+}
+
+async function loadTagsByType(type, containerId) {
+    const container = document.getElementById(containerId);
     
-    /**
-     * Отображение тегов в контейнере
-     */
-    function displayTags(containerId, tags) {
-        const container = document.getElementById(containerId);
+    try {
+        const response = await fetch(`${API_BASE_URL}/Tags/by-type/${type}`, {
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Ошибка загрузки тегов');
+
+        const tags = await response.json();
         
-        if (!tags || tags.length === 0) {
+        if (tags.length === 0) {
             container.innerHTML = '<p class="text-muted">Нет тегов</p>';
             return;
         }
-        
-        container.innerHTML = tags.map(tag => createTagElement(tag)).join('');
-    }
-    
-    /**
-     * Создание HTML элемента тега
-     */
-    function createTagElement(tag) {
-        const bgColor = tag.color || '#007bff';
-        const icon = tag.icon || '🏷️';
-        
-        return `
-            <div class="tag-item" style="background-color: ${bgColor}20; border-left: 3px solid ${bgColor};">
-                <span class="tag-icon">${icon}</span>
-                <span class="tag-name">${tag.name}</span>
-                <span class="tag-actions">
-                    <button onclick="deleteTag('${tag.id}')" title="Удалить">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-x"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                </span>
-            </div>
-        `;
-    }
-    
-    /**
-     * Удаление тега
-     */
-    window.deleteTag = async function(id) {
-        if (!confirm('Вы уверены, что хотите удалить этот тег?')) {
-            return;
-        }
-        
-        try {
-            await window.tagsService.deleteTag(id);
-            loadTags();
-            showNotification('Тег удален', 'success');
-        } catch (error) {
-            showNotification('Ошибка при удалении тега: ' + (error.data?.message || error.message), 'error');
-        }
-    };
-    
-    /**
-     * Показ уведомления
-     */
-    function showNotification(message, type) {
-        // Простое уведомление через alert (можно заменить на toast)
-        alert(message);
-    }
-});
 
+        container.innerHTML = tags.map(tag => createTagElement(tag)).join('');
+        
+        // Привязываем обработчики к кнопкам
+        container.querySelectorAll('.edit-tag-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const tagId = btn.getAttribute('data-tag-id');
+                openEditTagModal(tagId);
+            });
+        });
+        
+        container.querySelectorAll('.delete-tag-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const tagId = btn.getAttribute('data-tag-id');
+                const tagName = btn.getAttribute('data-tag-name');
+                deleteTag(tagId, tagName);
+            });
+        });
+    } catch (error) {
+        console.error('Ошибка:', error);
+        container.innerHTML = '<p class="text-danger">Ошибка загрузки</p>';
+    }
+}
+
+function createTagElement(tag) {
+    const color = tag.color || '#007bff';
+    const icon = tag.icon || '🏷️';
+    
+    return `
+        <div class="tag-item" style="background-color: ${color}20; border-left: 3px solid ${color}">
+            <span class="tag-icon">${icon}</span>
+            <span class="tag-name">${tag.name}</span>
+            <span class="tag-actions">
+                <button class="edit-tag-btn" data-tag-id="${tag.id}" title="Редактировать">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="delete-tag-btn" data-tag-id="${tag.id}" data-tag-name="${tag.name}" title="Удалить">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </span>
+        </div>
+    `;
+}
+
+async function saveTag() {
+    const name = document.getElementById('tag-name').value.trim();
+    const type = parseInt(document.getElementById('tag-type').value);
+    const color = document.getElementById('tag-color').value;
+    const icon = document.getElementById('tag-icon').value.trim();
+
+    if (!name) {
+        showNotification('Введите название тега', 'warning');
+        return;
+    }
+
+    const tagData = {
+        name: name,
+        type: type,
+        color: color || '#007bff',
+        icon: icon || '🏷️',
+        visibility: 0 // Private
+    };
+
+    try {
+        let response;
+        
+        if (currentEditingTagId) {
+            // Обновление существующего тега
+            response = await fetch(`${API_BASE_URL}/Tags/${currentEditingTagId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify(tagData)
+            });
+        } else {
+            // Создание нового тега
+            response = await fetch(`${API_BASE_URL}/Tags`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify(tagData)
+            });
+        }
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Ошибка сохранения тега');
+        }
+
+        showNotification(currentEditingTagId ? 'Тег обновлен' : 'Тег создан', 'success');
+        
+        // Перезагружаем теги СНАЧАЛА
+        await loadAllTags();
+        
+        // Закрываем модальное окно
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addTagModal'));
+        modal.hide();
+        
+        // Сбрасываем форму
+        document.getElementById('tag-form').reset();
+        currentEditingTagId = null;
+        
+        // Обновляем название модального окна
+        document.getElementById('addTagModalLabel').textContent = 'Добавить тег';
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showNotification(error.message, 'error');
+    }
+}
+
+async function openEditTagModal(tagId) {
+    try {
+        const response = await fetch(`${API_BASE_URL}/Tags/${tagId}`, {
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+        });
+
+        if (!response.ok) throw new Error('Ошибка загрузки тега');
+
+        const tag = await response.json();
+        
+        // Заполняем форму
+        document.getElementById('tag-name').value = tag.name;
+        document.getElementById('tag-type').value = getTypeValue(tag.type);
+        document.getElementById('tag-color').value = tag.color || '#007bff';
+        document.getElementById('tag-icon').value = tag.icon || '';
+        
+        // Устанавливаем ID редактируемого тега
+        currentEditingTagId = tagId;
+        
+        // Меняем заголовок модального окна
+        document.getElementById('addTagModalLabel').textContent = 'Редактировать тег';
+        
+        // Открываем модальное окно
+        const modal = new bootstrap.Modal(document.getElementById('addTagModal'));
+        modal.show();
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showNotification('Ошибка загрузки данных тега', 'error');
+    }
+}
+
+async function deleteTag(tagId, tagName) {
+    if (!confirm(`Вы уверены, что хотите удалить тег "${tagName}"?`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/Tags/${tagId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${getToken()}`
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Ошибка удаления тега');
+        }
+
+        showNotification('Тег удален', 'success');
+        await loadAllTags();
+    } catch (error) {
+        console.error('Ошибка:', error);
+        showNotification(error.message, 'error');
+    }
+}
+
+function getTypeValue(typeString) {
+    const types = {
+        'Income': 0,
+        'Expense': 1,
+        'Transfer': 2
+    };
+    return types[typeString] || 0;
+}
+
+function getToken() {
+    // Получаем токен из localStorage или cookies
+    return localStorage.getItem('access_token') || '';
+}
+
+function showNotification(message, type = 'info') {
+    // Простая реализация уведомлений
+    const alertClass = type === 'success' ? 'alert-success' : 
+                      type === 'error' ? 'alert-danger' : 
+                      type === 'warning' ? 'alert-warning' : 'alert-info';
+    
+    const notification = document.createElement('div');
+    notification.className = `alert ${alertClass} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Сброс формы при закрытии модального окна
+document.getElementById('addTagModal').addEventListener('hidden.bs.modal', function () {
+    document.getElementById('tag-form').reset();
+    currentEditingTagId = null;
+    document.getElementById('addTagModalLabel').textContent = 'Добавить тег';
+});

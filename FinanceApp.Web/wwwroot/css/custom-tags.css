@@ -1,0 +1,193 @@
+/* Стили для отображения тегов */
+
+/* Стили для основной кнопки добавления тега */
+.btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+    box-shadow: 0 6px 16px rgba(17, 153, 142, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-success i {
+    color: white;
+}
+
+.tags-container {
+    min-height: 100px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.tag-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 10px 14px;
+    margin: 6px 4px;
+    border-radius: 8px;
+    background-color: #f1f2f3;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.tag-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.tag-item .tag-icon {
+    font-size: 1.2em;
+    margin-right: 6px;
+}
+
+.tag-item .tag-name {
+    font-weight: 600;
+    font-size: 0.95em;
+    margin-right: 8px;
+    color: #333;
+}
+
+.tag-item .badge {
+    font-size: 0.75em;
+    padding: 3px 7px;
+    border-radius: 10px;
+}
+
+.tag-item .tag-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+}
+
+.tag-item .tag-actions button {
+    border: none;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tag-item .tag-actions button i {
+    color: white;
+}
+
+.tag-item .tag-actions .edit-tag-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.tag-item .tag-actions .edit-tag-btn:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+    transform: translateY(-2px);
+}
+
+.tag-item .tag-actions .delete-tag-btn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
+}
+
+.tag-item .tag-actions .delete-tag-btn:hover {
+    background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+    box-shadow: 0 4px 12px rgba(245, 87, 108, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Стили для модального окна */
+#addTagModal .modal-body {
+    padding: 1.5rem;
+}
+
+#addTagModal .form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+#addTagModal input[type="color"] {
+    height: 45px;
+    cursor: pointer;
+}
+
+/* Стили для кнопок модального окна с градиентами */
+#addTagModal .btn i {
+    color: white;
+}
+
+#addTagModal .btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+    transition: all 0.3s ease;
+    color: white;
+}
+
+#addTagModal .btn-success:hover {
+    background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+    box-shadow: 0 6px 16px rgba(17, 153, 142, 0.5);
+    transform: translateY(-2px);
+}
+
+#addTagModal .btn-secondary {
+    background: linear-gradient(135deg, #868f96 0%, #596164 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    transition: all 0.3s ease;
+    color: white;
+}
+
+#addTagModal .btn-secondary:hover {
+    background: linear-gradient(135deg, #596164 0%, #868f96 100%);
+    box-shadow: 0 6px 16px rgba(108, 117, 125, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Скроллбар для контейнера тегов */
+.tags-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tags-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.tags-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.tags-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .tag-item {
+        padding: 8px 12px;
+        margin: 4px 2px;
+    }
+    
+    .tag-item .tag-name {
+        font-size: 0.9em;
+    }
+    
+    .tag-item .tag-actions button {
+        padding: 3px 6px;
+        font-size: 0.85em;
+    }
+}
+

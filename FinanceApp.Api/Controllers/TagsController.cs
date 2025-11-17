@@ -60,13 +60,13 @@ public class TagsController : ControllerBase
     /// Получить теги по типу
     /// </summary>
     /// <param name="type">Тип тега (Income, Expense, Transfer)</param>
-    /// <param name="userId">ID пользователя (опционально, для фильтрации приватных тегов)</param>
     [HttpGet("by-type/{type}")]
     [ProducesResponseType(typeof(List<TagDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetByType(
-        TagType type,
-        [FromQuery] Guid? userId = null)
+    public async Task<IActionResult> GetByType(TagType type)
     {
+        // Извлекаем userId из токена
+        var userId = User.GetUserId();
+        
         var tags = await _tagService.GetByTypeAsync(type, userId);
         return Ok(tags);
     }
@@ -75,13 +75,13 @@ public class TagsController : ControllerBase
     /// Получить дерево тегов
     /// </summary>
     /// <param name="type">Тип тега (опционально)</param>
-    /// <param name="userId">ID пользователя (опционально)</param>
     [HttpGet("tree")]
     [ProducesResponseType(typeof(List<TagDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetTree(
-        [FromQuery] TagType? type = null,
-        [FromQuery] Guid? userId = null)
+    public async Task<IActionResult> GetTree([FromQuery] TagType? type = null)
     {
+        // Извлекаем userId из токена
+        var userId = User.GetUserId();
+        
         var tree = await _tagService.GetTreeAsync(type, userId);
         return Ok(tree);
     }
@@ -105,18 +105,18 @@ public class TagsController : ControllerBase
     /// Поиск тегов
     /// </summary>
     /// <param name="query">Поисковый запрос</param>
-    /// <param name="userId">ID пользователя (опционально)</param>
     [HttpGet("search")]
     [ProducesResponseType(typeof(List<TagDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> Search(
-        [FromQuery] string query,
-        [FromQuery] Guid? userId = null)
+    public async Task<IActionResult> Search([FromQuery] string query)
     {
         if (string.IsNullOrWhiteSpace(query))
             return BadRequest(new { message = "Query parameter is required" });
         
         if (query.Length < 2)
             return BadRequest(new { message = "Query must be at least 2 characters" });
+        
+        // Извлекаем userId из токена
+        var userId = User.GetUserId();
         
         var tags = await _tagService.SearchAsync(query, userId);
         return Ok(tags);
@@ -168,6 +168,8 @@ public class TagsController : ControllerBase
     {
         try
         {
+            var userId = User.GetUserId();
+            dto.OwnerId ??= userId;
             var tag = await _tagService.UpdateAsync(id, dto);
             return Ok(tag);
         }
@@ -230,11 +232,13 @@ public class TagsController : ControllerBase
     /// <summary>
     /// Получить статистику по типам тегов
     /// </summary>
-    /// <param name="userId">ID пользователя (опционально)</param>
     [HttpGet("stats")]
     [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetStats([FromQuery] Guid? userId = null)
+    public async Task<IActionResult> GetStats()
     {
+        // Извлекаем userId из токена
+        var userId = User.GetUserId();
+        
         // Эту функциональность нужно добавить в ITagService
         // Пока возвращаем заглушку
         return Ok(new Dictionary<string, int>
@@ -250,14 +254,15 @@ public class TagsController : ControllerBase
     /// </summary>
     /// <param name="type">Фильтр по типу</param>
     /// <param name="visibility">Фильтр по видимости</param>
-    /// <param name="userId">ID пользователя</param>
     [HttpGet]
     [ProducesResponseType(typeof(List<TagDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
         [FromQuery] TagType? type = null,
-        [FromQuery] TagVisibility? visibility = null,
-        [FromQuery] Guid? userId = null)
+        [FromQuery] TagVisibility? visibility = null)
     {
+        // Извлекаем userId из токена
+        var userId = User.GetUserId();
+        
         if (type.HasValue)
         {
             var tags = await _tagService.GetByTypeAsync(type.Value, userId);

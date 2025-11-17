@@ -5,6 +5,7 @@
 
 @section Styles {
     <link href="~/src/plugins/css/light/tagify/custom-tagify.css" rel="stylesheet" type="text/css" />
+    <link href="~/css/custom-tags.css" rel="stylesheet" type="text/css" />
     @* <link href="~/src/plugins/css/dark/tagify/custom-tagify.css" rel="stylesheet" type="text/css" /> *@
 }
 
@@ -24,8 +25,8 @@
         <div class="widget">
             <div class="widget-heading p-4">
                 <h5 class="">Теги</h5>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTagModal">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-plus"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addTagModal">
+                    <i class="fas fa-plus me-2"></i>
                     Добавить тег
                 </button>
             </div>
@@ -124,51 +125,21 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                <button type="button" class="btn btn-primary" id="save-tag-btn">Сохранить</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Отмена
+                </button>
+                <button type="button" class="btn btn-success" id="save-tag-btn">
+                    <i class="fas fa-check me-2"></i>
+                    Сохранить
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="~/js/app/config.js"></script>
     <script src="~/js/app/tags-page.js"></script>
 }
-
-<style>
-    .tags-container {
-        min-height: 100px;
-    }
-    
-    .tag-item {
-        display: inline-block;
-        padding: 8px 12px;
-        margin: 4px;
-        border-radius: 6px;
-        background-color: #f1f2f3;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    
-    .tag-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    
-    .tag-item .tag-name {
-        font-weight: 600;
-        margin-left: 4px;
-    }
-    
-    .tag-item .tag-actions {
-        margin-left: 8px;
-    }
-    
-    .tag-item .tag-actions button {
-        border: none;
-        background: transparent;
-        padding: 0 4px;
-        cursor: pointer;
-    }
-</style>
 

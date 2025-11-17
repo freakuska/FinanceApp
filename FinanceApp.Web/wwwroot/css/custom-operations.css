@@ -1,0 +1,423 @@
+/* Стили для кнопок с Font Awesome иконками */
+.btn i {
+    margin-right: 6px;
+    color: white;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+    box-shadow: 0 6px 16px rgba(17, 153, 142, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(238, 9, 121, 0.3);
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #ff6a00 0%, #ee0979 100%);
+    box-shadow: 0 6px 16px rgba(238, 9, 121, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #868f96 0%, #596164 100%);
+    border: none;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #596164 0%, #868f96 100%);
+    box-shadow: 0 6px 16px rgba(108, 117, 125, 0.5);
+    transform: translateY(-2px);
+}
+
+/* Стили для тегов в модальном окне */
+.badge.cursor-pointer {
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.badge.cursor-pointer:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.badge.bg-primary {
+    background-color: #1b55e2 !important;
+}
+
+.badge.bg-secondary {
+    background-color: #888ea8 !important;
+}
+
+#edit-operation-tags-container {
+    min-height: 50px;
+    padding: 10px;
+    border: 1px solid #e0e6ed;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+}
+
+/* Стили для отображения операций на дашборде */
+
+.operations-table {
+    width: 100%;
+}
+
+.operations-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.operations-table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.operation-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.operation-action-btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.operation-action-btn i {
+    color: white;
+}
+
+.operation-action-btn.edit-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.operation-action-btn.edit-btn:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+    transform: translateY(-2px);
+}
+
+.operation-action-btn.delete-btn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
+}
+
+.operation-action-btn.delete-btn:hover {
+    background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+    box-shadow: 0 4px 12px rgba(245, 87, 108, 0.5);
+    transform: translateY(-2px);
+}
+
+.operation-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.operation-type-badge.income {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.operation-type-badge.expense {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.operation-amount {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.operation-amount.income {
+    color: #28a745;
+}
+
+.operation-amount.expense {
+    color: #dc3545;
+}
+
+.operation-description {
+    color: #333;
+    font-weight: 500;
+}
+
+.operation-description.empty {
+    color: #999;
+    font-style: italic;
+}
+
+.operation-date {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Модальное окно редактирования */
+#editOperationModal .modal-dialog {
+    max-width: 600px;
+}
+
+#editOperationModal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom: none;
+}
+
+#editOperationModal .modal-header .btn-close {
+    filter: brightness(0) invert(1);
+}
+
+#editOperationModal .form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+#editOperationModal .form-control,
+#editOperationModal .form-select {
+    border: 2px solid #e0e6ed;
+    border-radius: 8px;
+    padding: 10px 14px;
+    transition: all 0.2s ease;
+}
+
+#editOperationModal .form-control:focus,
+#editOperationModal .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+#editOperationModal .modal-footer {
+    border-top: 1px solid #e0e6ed;
+    padding: 1rem 1.5rem;
+}
+
+#editOperationModal .btn {
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+#editOperationModal .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+#editOperationModal .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+#editOperationModal .btn-danger {
+    background-color: #dc3545;
+    border: none;
+}
+
+#editOperationModal .btn-danger:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+}
+
+/* Пустое состояние */
+.operations-empty {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #999;
+}
+
+.operations-empty svg {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* Загрузка */
+.operations-loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.operations-loading .spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Inline редактирование */
+.inline-edit-form {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.inline-edit-form .form-control-sm,
+.inline-edit-form .form-select {
+    font-size: 0.875rem;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.inline-edit-form .form-control-sm:focus,
+.inline-edit-form .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+}
+
+.inline-edit-form .form-label {
+    color: #495057;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.inline-edit-form .btn-sm {
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.inline-edit-form .btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.inline-edit-form .btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.inline-edit-form .btn-secondary:hover {
+    transform: translateY(-1px);
+}
+
+/* Подсказка при наведении на строку убрана */
+.operations-table tbody tr[data-operation-id]:hover {
+    background-color: rgba(102, 126, 234, 0.05);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .operation-actions {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .operation-action-btn {
+        width: 100%;
+    }
+    
+    .operation-amount {
+        font-size: 1rem;
+    }
+    
+    #editOperationModal .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .inline-edit-form .col-md-2,
+    .inline-edit-form .col-md-3 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .operations-table tbody tr[data-operation-id]:hover::after {
+        display: none;
+    }
+}
+
+/* Анимация появления строк */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.operations-table tbody tr {
+    animation: fadeInUp 0.3s ease;
+}
+
+/* Выделение при наведении на строку */
+.operations-table tbody tr {
+    cursor: default;
+}
+
+.operations-table tbody tr:hover .operation-action-btn {
+    opacity: 1;
+}
+
+.operation-action-btn {
+    opacity: 0.7;
+}
+
+/* Стили для badge способа оплаты */
+.payment-method-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.payment-method-badge.cash {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+}
+
+.payment-method-badge.card {
+    background-color: rgba(0, 123, 255, 0.1);
+    color: #007bff;
+}
+
+.payment-method-badge.transfer {
+    background-color: rgba(108, 117, 125, 0.1);
+    color: #6c757d;
+}
+

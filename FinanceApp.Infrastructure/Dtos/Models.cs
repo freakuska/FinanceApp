@@ -108,10 +108,12 @@ public record CreateTagDto
 public record UpdateTagDto
 {
     public string? Name { get; init; }
+    public TagType? Type { get; init; } // Добавлено для возможности изменения типа
     public string? Icon { get; init; }
     public string? Color { get; init; }
     
     public Guid? ParentId { get; init; }
+    public Guid? OwnerId { get; set; } // Для передачи тега другому пользователю
     
     public TagVisibility Visibility { get; init; }
     public int? SortOrder { get; init; }

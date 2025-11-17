@@ -406,6 +406,7 @@ public class TagService : ITagService
     public async Task<TagDto> GetByIdAsync(Guid id)
     {
         var tag = await _context.Tags
+            .AsNoTracking() // Всегда получаем свежие данные из БД, без кеширования
             .Include(t => t.ChildTags)
                 .ThenInclude(ct => ct.ChildTags) // Подгружаем вложенные дочерние теги
             .Include(t => t.ParentTag) // Подгружаем родителя
@@ -417,6 +418,7 @@ public class TagService : ITagService
     public async Task<TagDto> GetBySlugAsync(string slug)
     {
         var tag = await _context.Tags
+            .AsNoTracking() // Всегда получаем свежие данные из БД
             .Include(t => t.ChildTags)
             .FirstOrDefaultAsync(t => t.Slug == slug);
 
@@ -524,16 +526,30 @@ public class TagService : ITagService
             }
         }
 
-        tag.Icon = dto.Icon ?? tag.Icon;
-        tag.Color = dto.Color ?? tag.Color;
+        // Обновляем Type если указан
+        if (dto.Type.HasValue)
+            tag.Type = dto.Type.Value;
+        
+        // Обновляем Icon и Color (разрешаем установку null для очистки, если передано явно)
+        if (dto.Icon != null)
+            tag.Icon = dto.Icon;
+        
+        if (dto.Color != null)
+            tag.Color = dto.Color;
+        
+        // Обновляем владельца если указан (передача тега другому пользователю)
+        if (dto.OwnerId.HasValue)
+            tag.OwnerId = dto.OwnerId.Value;
+            
         tag.Visibility = dto.Visibility;
-        tag.ParentId = dto.ParentId;
-        tag.OwnerId = tag.OwnerId;
         
         if (dto.SortOrder.HasValue)
             tag.SortOrder = dto.SortOrder.Value;
 
         tag.UpdatedAt = DateTime.UtcNow;
+
+        // Явно помечаем сущность как Modified для гарантии сохранения
+        _context.Entry(tag).State = EntityState.Modified;
 
         await _context.SaveChangesAsync();
         
@@ -573,6 +589,7 @@ public class TagService : ITagService
     public async Task<List<TagDto>> GetByTypeAsync(TagType type, Guid? userId = null)
     {
         var query = _context.Tags
+            .AsNoTracking() // Всегда получаем свежие данные из БД
             .Where(t => t.IsActive && t.Type == type);
 
         if (userId.HasValue)
@@ -597,6 +614,7 @@ public class TagService : ITagService
     public async Task<List<TagDto>> GetTreeAsync(TagType? type = null, Guid? userId = null)
     {
         var query = _context.Tags
+            .AsNoTracking() // Всегда получаем свежие данные из БД
             .Include(t => t.ChildTags)
             .Where(t => t.IsActive && t.ParentId == null);
 
@@ -844,11 +862,11 @@ public class FinancialOperationService : IFinancialOperationService
             operation.PaymentMethod = dto.PaymentMethod.Value;
         }
 
-        // Обновляем описание и заметки
-        if (!string.IsNullOrEmpty(dto.Description))
+        // Обновляем описание и заметки (разрешаем установку null для очистки)
+        if (dto.Description != null)
             operation.Description = dto.Description;
         
-        if (!string.IsNullOrEmpty(dto.Notes))
+        if (dto.Notes != null)
             operation.Notes = dto.Notes;
 
         // Обновляем дату операции
